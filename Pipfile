@@ -9,7 +9,11 @@ flake8 = "*"
 
 [packages]
 django = "*"
-djangorestframework = "*"
+djangorestframework = "==3.11.0"
+pillow = "*"
+python-decouple = "*"
+dj-database-url = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.6"

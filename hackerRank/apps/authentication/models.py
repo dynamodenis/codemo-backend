@@ -66,7 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         Returns a string representation of this `User`.
         This string is used when a `User` is printed in the console.
         """
-        return self.email
+        return self.username
 
     @property
     def get_full_name(self):
