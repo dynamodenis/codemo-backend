@@ -1,11 +1,12 @@
-from django.conf.urls import url
-
+from django.urls import path
 from .views import (
-    LoginAPIView, RegistrationAPIView, UserRetrieveUpdateAPIView
+    LoginAPIView, StudentRegistrationAPIView, MentorRegistrationAPIView, UserRetrieveUpdateAPIView
 )
 
 urlpatterns = [
-    url(r'^user/?$', UserRetrieveUpdateAPIView.as_view()),
-    url(r'^users/?$', RegistrationAPIView.as_view()),
-    url(r'^users/login/?$', LoginAPIView.as_view()),
+    path('mentor/register/', MentorRegistrationAPIView.as_view()),
+    path('student/register/', StudentRegistrationAPIView.as_view()),
+    path('login/', LoginAPIView.as_view(),),
+    path('user/', UserRetrieveUpdateAPIView.as_view())
 ]
+
