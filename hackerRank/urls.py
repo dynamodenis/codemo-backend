@@ -15,13 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from django.conf.urls import include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(
-        ('hackerRank.apps.authentication.urls', 'authentication'), namespace='authentication')),
-    path('', include('user_profile.urls')),
+    path('api/', include('user_profile.urls')),
+    path('api/auth/', include(('hackerRank.apps.authentication.urls', 'authentication'), namespace='authentication')),
 ]
+
 

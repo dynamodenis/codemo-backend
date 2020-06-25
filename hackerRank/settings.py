@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+import datetime
 import os
 import dj_database_url
 from decouple import config,Csv
@@ -22,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '6peiom#l)wl3dkg-!hdjld^8(a^+cb84-ps6ou+vyh4ay-wezn'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,10 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'hackerRank.apps.authentication',
     'user_profile.apps.UserProfileConfig',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -53,7 +54,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.BrokenLinkEmailsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'hackerRank.urls'
 
@@ -89,7 +95,6 @@ DATABASES = {
         'HOST':'127.0.0.1',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -134,9 +139,23 @@ MEDIA_URL='media/'
 MEDIA_ROOT=os.path.join(BASE_DIR,'media')
 
 
-
-# Tell Django about the custom `User` model we created. The string
-# `authentication.User` tells Django we are referring to the `User` model in
-# the `authentication` module. This module is registered above in a setting
-# called `INSTALLED_APPS`.
 AUTH_USER_MODEL = 'authentication.User'
+
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'hackerRank.apps.authentication.exceptions.core_exception_handler',
+    'NON_FIELD_ERRORS_KEY': 'error',
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'hackerRank.apps.authentication.backends.JWTAuthentication',)
+}
+
+
+# jwt settings.py
+JWT_AUTH = {
+    'JWT_VERIFY': True,
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3000),
+}

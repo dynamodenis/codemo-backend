@@ -1,23 +1,13 @@
-from django.db import models
+import jwt
 from django.conf import settings
-from django.contrib.auth.models import (
-    AbstractBaseUser, BaseUserManager, PermissionsMixin
-)
-from datetime import datetime, timedelta
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 
 class UserManager(BaseUserManager):
-    """
-    Django requires that custom users define their own Manager class. By
-    inheriting from `BaseUserManager`, we get a lot of the same code used by
-    Django to create a `User` for free.
-    All we have to do is override the `create_user` function which we will use
-    to create `User` objects.
-    """
-
     def create_user(self, username, email, password):
         if username is None:
-            raise TypeError('Users must have a username.')
+            raise TypeError('Users must have a name.')
 
         if email is None:
             raise TypeError('Users must have an email address.')
@@ -28,11 +18,6 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, username, email, password):
-        """
-        Create and return a `User` with superuser powers.
-        Superuser powers means that this use is an admin that can do anything
-        they want.
-        """
         if password is None:
             raise TypeError('Superusers must have a password.')
 
@@ -43,44 +28,64 @@ class UserManager(BaseUserManager):
 
         return user
 
+    def create_student(self, username, email, password=None):
+        if email is None:
+            raise TypeError('Users must have an email address.')
+        student = self.create_user(username, email, password)
+        student.set_password(password)
+        student.is_student = True
+        student.save()
+        return student
+
+    def create_mentor(self, username, email, password=None):
+        if email is None:
+            raise TypeError('Users must have an email address.')
+        mentor = self.create_user(username, email, password)
+        mentor.set_password(password)
+        mentor.is_mentor = True
+        mentor.save()
+        return mentor
+
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(db_index=True, max_length=255, unique=True)
-    email = models.EmailField(db_index=True, unique=True)
+    username = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_student = models.BooleanField(default=False)
+    is_mentor = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
 
-    # The `USERNAME_FIELD` property tells us which field we will use to log in.
-    # In this case, we want that to be the email field.
     USERNAME_FIELD = 'email'
+
     REQUIRED_FIELDS = ['username']
 
-    # Tells Django that the UserManager class defined above should manage
-    # objects of this type.
     objects = UserManager()
 
     def __str__(self):
-        """
-        Returns a string representation of this `User`.
-        This string is used when a `User` is printed in the console.
-        """
-        return self.username
-
+        return self.email
+  
     @property
+    def token(self):
+        return self._generate_jwt_token()
+
     def get_full_name(self):
-        """
-        This method is required by Django for things like handling emails.
-        Typically, this would be the user's first and last name. Since we do
-        not store the user's real name, we return their username instead.
-        """
         return self.username
 
     def get_short_name(self):
-        """
-        This method is required by Django for things like handling emails.
-        Typically, this would be the user's first name. Since we do not store
-        the user's real name, we return their username instead.
-        """
         return self.username
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+
+    def _generate_jwt_token(self):
+ 
+        token = jwt.encode({
+            'id': self.pk, 
+            'email':self.email, 
+        }, settings.SECRET_KEY, algorithm='HS256')
+
+        return token.decode('utf-8')
