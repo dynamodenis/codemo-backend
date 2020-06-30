@@ -31,8 +31,8 @@ class ProfileAPI(APIView):
         serialize=ProfileSerializer(profile)
         return Response(serialize.data)
     
-    def put(self,request,pk, format=None):
-        profile=self.get_profile(pk)
+    def put(self,request, format=None):
+        profile=self.get_profile(request.user.id)
         serializer=ProfileSerializer(profile,request.data)
         if serializer.is_valid():
             serializer.save()

@@ -64,10 +64,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-  
-    @property
-    def token(self):
-        return self._generate_jwt_token()
 
     def get_full_name(self):
         return self.username
@@ -80,12 +76,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return True
-
-    def _generate_jwt_token(self):
- 
-        token = jwt.encode({
-            'id': self.pk, 
-            'email':self.email, 
-        }, settings.SECRET_KEY, algorithm='HS256')
-
-        return token.decode('utf-8')
