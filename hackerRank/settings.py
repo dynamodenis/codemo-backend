@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import datetime
+from datetime import timedelta
 import os
 import dj_database_url
 from decouple import config,Csv
@@ -147,6 +148,7 @@ MEDIA_ROOT=os.path.join(BASE_DIR,'media')
 
 AUTH_USER_MODEL = 'authentication.User'
 
+
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'hackerRank.apps.authentication.exceptions.core_exception_handler',
     'NON_FIELD_ERRORS_KEY': 'error',
@@ -154,21 +156,32 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'hackerRank.apps.authentication.backends.JWTAuthentication',)
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+
+    )
 }
 
 
-# jwt settings.py
-JWT_AUTH = {
-    'JWT_VERIFY': True,
-    'JWT_VERIFY_EXPIRATION': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3000),
+
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'JTI_CLAIM': 'jti',
 }
 
-DEFAULT_PARSER_CLASSES: (
-    'rest_framework.parsers.JSONParser',
-    'rest_framework.parsers.FormParser',
-    'rest_framework.parsers.MultiPartParser',
-)
+
 

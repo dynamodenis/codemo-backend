@@ -4,11 +4,11 @@ from django.conf import settings
 
 from rest_framework import authentication, exceptions
 
-from .models import User
+# from .models import User
 
-# from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model
 
-# User=get_user_model()
+User=get_user_model()
 
 
 class JWTAuthentication(authentication.BaseAuthentication):
@@ -47,6 +47,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
         except:
+            # import pdb; pdb.set_trace()
             msg = 'Invalid authentication. Could not decode token.'
             raise exceptions.AuthenticationFailed(msg)
 
@@ -61,3 +62,5 @@ class JWTAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(msg)
 
         return (user, token)
+
+    

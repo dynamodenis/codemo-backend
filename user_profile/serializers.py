@@ -8,59 +8,6 @@ from rest_framework import serializers, status
 
 User = get_user_model()
 
-# class Base64ImageField(serializers.ImageField):
-#     """
-#     A Django REST framework field for handling image-uploads through raw post data.
-#     It uses base64 for encoding and decoding the contents of the file.
-
-#     Heavily based on
-#     https://github.com/tomchristie/django-rest-framework/pull/1268
-
-#     Updated for Django REST framework 3.
-#     """
-
-#     def to_internal_value(self, data):
-#         from django.core.files.base import ContentFile
-#         import base64
-#         import six
-#         import uuid
-
-#         # Check if this is a base64 string
-#         if isinstance(data, six.string_types):
-#             # Check if the base64 string is in the "data:" format
-#             if 'data:' in data and ';base64,' in data:
-#                 # Break out the header from the base64 content
-#                 header, data = data.split(';base64,')
-
-#             # Try to decode the file. Return validation error if it fails.
-#             try:
-#                 decoded_file = base64.b64decode(data)
-#                 # decoded_file = base64.b64decode(openssl enc -d -base64 -in b64string -out binary_data)
-#             except TypeError:
-#                 self.fail('invalid_image')
-
-#             # Generate file name:
-#             file_name = str(uuid.uuid4())[:3] # 12 characters are more than enough.
-#             # Get the file name extension:
-#             file_extension = self.get_file_extension(file_name, decoded_file)
-
-#             complete_file_name = "%s.%s" % (file_name, file_extension, )
-
-#             data = ContentFile(decoded_file, name=complete_file_name)
-
-#         return super(Base64ImageField, self).to_internal_value(data)
-
-#     def get_file_extension(self, file_name, decoded_file):
-#         import imghdr
-
-#         extension = imghdr.what(file_name, decoded_file)
-#         extension = "jpg" if extension == "jpeg" else extension
-
-#         return extension
-
-
-
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
@@ -83,3 +30,14 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     from rest_framework import serializers    
 
+    def create(self, validated_data):
+        """
+        Overriding the default create method of the Model serializer.
+        :param validated_data: data containing all the details of student
+        :return: returns a successfully created student record
+        """
+        user_data = validated_data.pop('user')
+        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+        student, created = Project.objects.update_or_create(user=user,
+                            subject_major=validated_data.pop('subject_major'))
+        return student

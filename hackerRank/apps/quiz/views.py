@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from .models import Answer, Question, Quiz, QuizTaker, UsersAnswer
-from .serializers import MyQuizListSerializer, QuizDetailSerializer, QuizListSerializer, QuizResultSerializer, UsersAnswerSerializer
+from .serializers import MyQuizListSerializer, QuizDetailSerializer, QuizListSerializer, QuizResultSerializer, UsersAnswerSerializer, QuestionSerializer, AnswerSerializer
 
 
 class MyQuizListAPI(generics.ListAPIView):
@@ -73,6 +73,7 @@ class QuizDetailAPI(generics.RetrieveAPIView):
 				last_question = None
 
 		return Response({'quiz': self.get_serializer(quiz, context={'request': self.request}).data, 'last_question_id': last_question})
+	
 
 
 class SaveUsersAnswer(generics.UpdateAPIView):
@@ -146,3 +147,29 @@ class SubmitQuizAPI(generics.GenericAPIView):
 		quiztaker.save()
 
 		return Response(self.get_serializer(quiz).data)
+
+class QuestionsAPI(generics.ListAPIView):
+	serializer_class = QuestionSerializer
+	permission_classes = [
+		permissions.IsAuthenticated
+	]
+
+	def post(self, request, format=None):
+		serializer = self.serializer_class(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AnswersAPI(generics.ListAPIView):
+	serializer_class = AnswerSerializer
+	permission_classes = [
+		permissions.IsAuthenticated
+	]
+
+	def post(self, request, format=None):
+		serializer = self.serializer_class(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -6,7 +6,7 @@ class QuizListSerializer(serializers.ModelSerializer):
 	questions_count = serializers.SerializerMethodField()
 	class Meta:
 		model = Quiz
-		fields = ["id", "examiner", "name", "description", "slug", "questions_count"]
+		fields = ["id", "examiner", "name", "description", "slug", "questions_count", "roll_out"]
 		read_only_fields = ["questions_count"]
 
 	def get_questions_count(self, obj):
@@ -16,15 +16,19 @@ class QuizListSerializer(serializers.ModelSerializer):
 class AnswerSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Answer
-		fields = ["id", "question", "label"]
+		fields = ["id", "question", "label", "is_correct"]
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-	answer_set = AnswerSerializer(many=True)
+	answer_set = AnswerSerializer(many=True, read_only=True)
 
 	class Meta:
 		model = Question
-		fields = "__all__"
+		# fields = "__all__"
+		fields = ["id", "quiz", "label", "answer_set"]
+		read_only_fields = ["answer_set"]
+		
+
 
 
 class UsersAnswerSerializer(serializers.ModelSerializer):
