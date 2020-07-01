@@ -26,6 +26,7 @@ urlpatterns = [
     path(r'nested_admin/', include('nested_admin.urls')),
     path('api/', include(
         ('hackerRank.apps.quiz.urls', 'quiz'), namespace='quiz')),
+    path('api/trial/',include(('hackerRank.apps.trial.urls','trial'),namespace='trial')),
 
 ]
 if settings.DEBUG:

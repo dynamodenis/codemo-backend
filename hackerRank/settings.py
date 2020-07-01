@@ -32,7 +32,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 CORS_ORIGIN_ALLOW_ALL=True
-
+ACCESS_KEY = config('ACCESS_KEY')
 # Application definition
 
 INSTALLED_APPS = [
