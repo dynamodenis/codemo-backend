@@ -19,6 +19,7 @@ djangorestframework-jwt = "*"
 django-cors-headers = "*"
 six = "*"
 django-nested-admin = "*"
+requests = "*"
 
 [requires]
 python_version = "3.6"

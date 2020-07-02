@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'hackerRank.apps.authentication',
+    'hackerRank.apps.trial',
     'user_profile.apps.UserProfileConfig',
     'hackerRank.apps.quiz',
     'nested_admin',

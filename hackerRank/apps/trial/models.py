@@ -7,7 +7,7 @@ from django.template.defaultfilters import slugify
 
 
 class Quiz(models.Model):
-	examiner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	examiner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='tester')
 	roll_out = models.BooleanField(default=False)
 	name = models.CharField(max_length=100)
 	description = models.CharField(max_length=70)
@@ -41,7 +41,7 @@ class Answer(models.Model):
 
 
 class QuizTaker(models.Model):
-	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='quiz_taker')
 	quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
 	score = models.IntegerField(default=0)
 	completed = models.BooleanField(default=False)
