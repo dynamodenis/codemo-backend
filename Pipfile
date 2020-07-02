@@ -20,6 +20,9 @@ django-cors-headers = "*"
 six = "*"
 django-nested-admin = "*"
 requests = "*"
+whitenoise = "*"
+gunicorn = "*"
+django-heroku = "*"
 
 [requires]
 python_version = "3.6"
