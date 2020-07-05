@@ -105,7 +105,7 @@ class SaveUsersAnswer(generics.UpdateAPIView):
 
 
 class SubmitQuizAPI(generics.GenericAPIView):
-    	serializer_class = QuizResultSerializer
+	serializer_class = QuizResultSerializer
 	permission_classes = [
 		permissions.IsAuthenticated
 	]
