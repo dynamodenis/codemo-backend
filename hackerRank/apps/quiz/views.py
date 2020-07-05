@@ -4,7 +4,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from .models import Answer, Question, Quiz, QuizTaker, UsersAnswer
 from .serializers import MyQuizListSerializer, QuizDetailSerializer, QuizListSerializer, QuizResultSerializer, UsersAnswerSerializer, QuestionSerializer, AnswerSerializer
-
+from .email import send_results
 
 class MyQuizListAPI(generics.ListAPIView):
 	permission_classes = [
@@ -105,11 +105,21 @@ class SaveUsersAnswer(generics.UpdateAPIView):
 
 
 class SubmitQuizAPI(generics.GenericAPIView):
-	serializer_class = QuizResultSerializer
+    	serializer_class = QuizResultSerializer
 	permission_classes = [
 		permissions.IsAuthenticated
 	]
 
+	def get(self,request,*args,**kwargs):
+		# quiztaker_id = request.data['quiztaker']
+  
+		# quiztaker = get_object_or_404(QuizTaker, id=request.user.id)
+		quiz = Quiz.objects.get(slug=self.kwargs['slug'])
+		# print(quiztaker)
+		print(quiz)
+		return Response(self.get_serializer(quiz).data)
+
+ 
 	def post(self, request, *args, **kwargs):
 		quiztaker_id = request.data['quiztaker']
 		question_id = request.data['question']
@@ -137,13 +147,15 @@ class SubmitQuizAPI(generics.GenericAPIView):
 
 		for users_answer in UsersAnswer.objects.filter(quiz_taker=quiztaker):
 			answer = Answer.objects.get(question=users_answer.question, is_correct=True)
-			print(answer)
-			print(users_answer.answer)
+			# print(answer)
+			# print(users_answer.answer)
 			if users_answer.answer == answer:
 				correct_answers += 1
 
 		quiztaker.score = int(correct_answers / quiztaker.quiz.question_set.count() * 100)
-		print(quiztaker.score)
+		# print(quiztaker.score)
+  
+		send_results(score=quiztaker.score,quiz=quiz.name,description=quiz.description,questions=quiz.question_set.count,status=quiztaker.completed,receiver=request.user.email)
 		quiztaker.save()
 
 		return Response(self.get_serializer(quiz).data)
