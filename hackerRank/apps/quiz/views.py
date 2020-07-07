@@ -155,7 +155,7 @@ class SubmitQuizAPI(generics.GenericAPIView):
 		quiztaker.score = int(correct_answers / quiztaker.quiz.question_set.count() * 100)
 		# print(quiztaker.score)
   
-		send_results(score=quiztaker.score,quiz=quiz.name,description=quiz.description,questions=quiz.question_set.count,status=quiztaker.completed,receiver=request.user.email)
+		# send_results(score=quiztaker.score,quiz=quiz.name,description=quiz.description,questions=quiz.question_set.count,status=quiztaker.completed,receiver=request.user.email)
 		quiztaker.save()
 
 		return Response(self.get_serializer(quiz).data)
